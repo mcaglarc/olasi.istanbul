@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>Deprem Etki Simülatörü</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Deprem Etki Simülatörü: İstanbul için deprem şiddeti ve zemin etkisi görselleştirme aracı. Fay hatları, zemin amplifikasyonu ve ilçelere göre deprem şiddeti haritası. Farkındalık amaçlı açık kaynak web uygulaması.">
+  <meta name="keywords" content="deprem, simülatör, istanbul, fay hattı, zemin, amplifikasyon, deprem haritası, MMI, mikrobölgeleme, afet, risk, eğitim, farkındalık, açık kaynak, static web app">
+  <meta name="author" content="cagla">
+  <meta property="og:title" content="Deprem Etki Simülatörü - İstanbul">
+  <meta property="og:description" content="İstanbul için deprem şiddeti ve zemin etkisi simülasyonu. Fay hatları, zemin amplifikasyonu ve ilçelere göre deprem haritası.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://olasi.istanbul">
+  <meta property="og:image" content="https://olasi.istanbul/og-image.png">
+  <link rel="canonical" href="https://olasi.istanbul/">
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+  <meta property="og:image" content="./assets/logo.png">
+  <style>
+    body, html { height: 100vh; margin: 0; width: 100vw; overflow: hidden; }
+    body { font-family: 'Montserrat', Arial, sans-serif; background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%); color: #222; }
+    #hero { background: linear-gradient(90deg, #fff 0%, #e0eafc 100%); color: #222; padding: 12px 0 8px 0; text-align: center; box-shadow: 0 4px 16px rgba(44,62,80,0.12); border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; position: relative; width: 100%; display: flex; align-items: center; justify-content: flex-start; text-align: left; position: relative; }
+    #hero-logo { height: 72px; margin: 0 24px 0 24px; display: block; filter: drop-shadow(0 2px 8px rgba(44,62,80,0.10)); }
+    #hero-content { flex: 1; text-align: left; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+    #hero h1 { font-size: 1.3em; margin: 0 0 4px 0; font-weight: 700; color: #1a237e; }
+    #hero p { font-size: 1em; margin: 0 0 4px 0; opacity: 0.95; color: #1a237e; }
+    #helpBtn { position: absolute; top: 8px; right: 18px; background: #fff; color: #2980b9; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 1em; cursor: pointer; box-shadow: 0 2px 8px rgba(44,62,80,0.10); display: flex; align-items: center; justify-content: center; padding: 0; }
+    #refBtn { right: 54px; position: absolute; top: 8px; margin-left:4px;background:#fff;color:#2980b9;border:none;border-radius:16px;height:28px;font-size:1em;cursor:pointer;box-shadow:0 2px 8px rgba(44,62,80,0.10);display:flex;align-items:center;gap:6px;padding:0 12px 0 8px; }
+    #controls { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 8px 0 0 0; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(44,62,80,0.10); padding: 8px 14px; width: fit-content; margin-left: auto; margin-right: auto; }
+    #controls label { font-weight: bold; color: #2c3e50; font-size: 1em; margin-right: 8px; }
+    #magRange { accent-color: #2980b9; width: 140px; height: 4px; border-radius: 4px; background: #e0eafc; }
+    #magLabel { font-size: 1.1em; font-weight: bold; color: #2980b9; margin-left: 8px; }
+    #map { width: 100vw; height: calc(100vh - 120px); min-height: 120px; border-radius: 14px; box-shadow: 0 4px 24px rgba(44,62,80,0.10); border: 2px solid #e0eafc; display: block; margin: 0 auto; }
+    .legend { background: white; padding: 14px 16px; font-size: 1em; border: 1px solid #bdc3c7; border-radius: 10px; position: fixed; bottom: 24px; right: 24px; z-index: 1000; box-shadow: 0 0 12px rgba(44,62,80,0.13); min-width: 220px; opacity: 0.97; }
+    .legend .item { margin-bottom: 7px; display: flex; align-items: center; }
+    .legend .color-box { width: 16px; height: 16px; margin-right: 8px; border-radius: 4px; border: 1px solid #eee; box-shadow: 0 1px 2px rgba(44,62,80,0.07); }
+    .legend .vs30 { color: #16a085; font-weight: 600; margin-left: 8px; }
+    /* Responsive styles */
+    @media (max-width: 900px) {
+      #controls { flex-direction: column; gap: 6px; padding: 8px 6px; }
+      #map { height: calc(100vh - 100px); min-height: 120px; }
+      .legend { right: 8px; bottom: 8px; min-width: 140px; font-size: 0.95em; padding: 10px 8px; }
+    }
+    @media (max-width: 600px) {
+      #hero {
+        font-size: 0.98em;
+        padding: 4px 0 2px 0;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        min-height: unset;
+      }
+      #hero-logo {
+        height: 38px;
+        margin: 0 0 4px 0;
+      }
+      #hero-content {
+        align-items: center;
+        text-align: center;
+      }
+      #helpBtn, #refBtn {
+        position: static;
+        margin: 2px 2px 0 2px;
+      }
+      #hero h1 {
+        font-size: 1em;
+        margin-bottom: 2px;
+      }
+      #hero p {
+        font-size: 0.92em;
+        margin-bottom: 2px;
+      }
+      #controls { font-size: 0.98em; }
+      #map { height: calc(100vh - 80px); min-height: 80px; border-radius: 8px; }
+      .legend { font-size: 0.92em; padding: 7px 4px; border-radius: 7px; }
+    }
+    @media (max-width: 400px) {
+      #map { height: calc(100vh - 60px); }
+      .legend { font-size: 0.85em; padding: 4px 2px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="hero">
+    <img id="hero-logo" src="./assets/logo.png" alt="Deprem Simülatörü Logo">
+    <div id="hero-content">
+      <h1>Deprem Etki Simülatörü</h1>
+      <p>Farklı büyüklük ve merkez üssü senaryolarında İstanbul genelinde şiddet değişimini görselleştirir</p>
+    </div>
+    <button id="helpBtn" title="Yardım"><span aria-label="Yardım">❓</span></button>
+    <button id="refBtn" title="Referanslar">
+      <span style="font-size:1.1em;">🔗</span> Referanslar
+    </button>
+  </div>
+  <div id="controls">
+    <label for="magRange">Deprem Büyüklüğü (Mw):</label>
+    <input id="magRange" type="range" min="6.0" max="8.4" step="0.1" value="7.2">
+    <span id="magLabel">7.2</span>
+  </div>
+  <div id="map"></div>
+  <div id="helpModal" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:rgba(44,62,80,0.25);align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:14px;padding:24px 28px;max-width:400px;box-shadow:0 8px 32px rgba(44,62,80,0.18);text-align:left;position:relative;">
+      <button id="closeHelp" title="Kapat" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.3em;color:#888;cursor:pointer;">&times;</button>
+      <h2 style="margin-top:0;color:#2980b9;font-size:1.2em;">Nasıl Kullanılır?</h2>
+      <ul style="padding-left:18px;">
+        <li><b>Deprem merkezini seçmek için</b> mavi pimi <b>siyah çizgiler</b> (fay hatları) üzerine sürükleyin.</li>
+        <li><b>Büyüklük kaydırıcısı</b> ile deprem şiddetini değiştirin. Büyüklük arttıkça etki alanı genişler.</li>
+        <li>Harita üzerindeki <b>renkli kareler</b> her ilçedeki zemin etkisiyle ayarlanmış deprem şiddet bölgelerini gösterir.</li>
+        <li>Her kareye tıklayarak o noktadaki şiddet, ilçe amplifikasyonu ve açıklamayı görebilirsiniz.</li>
+        <li>Sağ alttaki <b>Etki Bölgeleri</b> kutusunda detaylı açıklamalar bulabilirsiniz.</li>
+        <li>Herhangi bir yerde <span style="color:#3498db;">ℹ️</span> simgesine tıklayarak bilgi alabilirsiniz.</li>
+      </ul>
+      <p style="margin-top:18px; color:#888; font-size:0.98em;">
+        Bu simülatör, deprem etkilerini <b>farkındalık</b> amacıyla sunar. Gerçek riskler ve güncel bilgiler için lütfen <b>resmi kaynaklara</b> başvurun.
+      </p>
+    </div>
+  </div>
+  <div id="refModal" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:rgba(44,62,80,0.25);align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:14px;padding:24px 28px;max-width:400px;box-shadow:0 8px 32px rgba(44,62,80,0.18);text-align:left;position:relative;">
+      <button id="closeRef" title="Kapat" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.3em;color:#888;cursor:pointer;">&times;</button>
+      <h2 style="margin-top:0;color:#2980b9;font-size:1.2em;">Referanslar</h2>
+      <ul style="padding-left:18px;">
+        <li><a href="https://depremzemin.ibb.istanbul/tr/istanbul-ili-mikrobolgeleme-projeleri" target="_blank" rel="noopener noreferrer">İstanbul İli Mikrobölgeleme Projeleri (İBB)</a></li>
+        <li><a href="https://www.mta.gov.tr/v3.0/hizmetler/yenilenmis-diri-fay-haritalari" target="_blank" rel="noopener noreferrer">Yenilenmiş Diri Fay Haritaları (MTA)</a></li>
+      </ul>
+    </div>
+  </div>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/turkiye-ilceler@1.2.0/dist/istanbul.geojson"></script>
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+  <script type="module">
+    import { faultSegments } from './js/coordinates.js';
+    import { districtAmpl } from './js/districtAmpl_data.js';
+    let legendDiv;
+    // Harita başlatma
+    var map = L.map('map').setView([41.05, 28.95], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18, attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    faultSegments.forEach(function(seg) {
+      L.polyline(seg, {color:'black', weight:2}).addTo(map);
+    });
+    var mmiLevels = [4,5,6,7,8,9];
+    var baseRadii = {4:120000,5:100000,6:80000,7:60000,8:40000,9:20000};
+    var colors = {4:'#66bd63',5:'#a6d96a',6:'#d9ef8b',7:'yellow',8:'orange',9:'red'};
+    var mmiInfo = {
+      9: 'Aşırı şiddetli sarsıntı: yapısal çökme ve yaygın yıkım.',
+      8: 'Ciddi sarsıntı: binalarda ağır hasar (çatlaklar, çöken duvarlar).',
+      7: 'Çok güçlü sarsıntı: binalarda orta düzey hasar (çatlaklar, dökülen sıva).',
+      6: 'Güçlü sarsıntı: iyi inşa edilmiş yapılarda hafif hasar.',
+      5: 'Orta şiddetli sarsıntı: binalarda küçük hasar (döküntü, küçük çatlaklar).',
+      4: 'Hafif sarsıntı: çok az ya da hiç hasar.'
+    };
+    var marker = L.marker([40.826944, 28.967500], {draggable:true}).addTo(map)
+      .bindPopup('🔵 Depremin merkez üssünü belirlemek için bu noktayı fay hattı üzerindeki herhangi bir konuma sürükleyebilirsiniz').openPopup();
+    var gridLayer = L.layerGroup().addTo(map);
+    // Fetch Istanbul districts GeoJSON from local file
+    fetch('./data/istanbul-districts.json')
+      .then(resp => resp.json())
+      .then(districtGeojson => {
+        // Remove district logs from console
+        const districtLayer = L.geoJSON(districtGeojson, {
+          onEachFeature: (feature, layer) => {
+            // Use 'name' property from your local file
+            feature.properties.name = feature.properties.name;
+          }
+        }).addTo(map);
+
+        function getDistrict(lat, lon) {
+          let found = null;
+          districtLayer.eachLayer(layer => {
+            // Fix: Use [lon, lat] for Turf.js point-in-polygon
+            if (layer.getBounds().contains([lat, lon]) && turf.booleanPointInPolygon([lon, lat], layer.feature)) {
+              found = layer.feature.properties.name;
+            }
+          });
+          return found;
+        }
+        function normalizeDistrictName(name) {
+          if (!name) return '';
+          return name.trim().toLocaleLowerCase('tr-TR')
+            .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+            .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u');
+        }
+        function getDistrictAmp(districtName) {
+          const norm = normalizeDistrictName(districtName);
+          const d = districtAmpl.find(d => normalizeDistrictName(d.district) === norm);
+          return d ? d.ampl : 1.0;
+        }
+        function computeMMI(mag, dist_km) {
+          if (dist_km < 1) dist_km = 1;
+          let mmi = 1.5 * mag - 3.0 * Math.log10(dist_km);
+          return mmi;
+        }
+        function getGeojsonBounds(geojson) {
+          let minLat = 90, maxLat = -90, minLon = 180, maxLon = -180;
+          geojson.features.forEach(f => {
+            const coords = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+            coords.forEach(poly => {
+              poly.forEach(ring => {
+                ring.forEach(([lon, lat]) => {
+                  if (lat < minLat) minLat = lat;
+                  if (lat > maxLat) maxLat = lat;
+                  if (lon < minLon) minLon = lon;
+                  if (lon > maxLon) maxLon = lon;
+                });
+              });
+            });
+          });
+          return { minLat, maxLat, minLon, maxLon };
+        }
+        function drawGridMMI() {
+          gridLayer.clearLayers();
+          var mag = parseFloat(document.getElementById('magRange').value);
+          document.getElementById('magLabel').textContent = mag.toFixed(1);
+          var latlng = marker.getLatLng();
+          var districtName = getDistrict(latlng.lat, latlng.lng);
+          var amplDistrict = getDistrictAmp(districtName);
+
+          // Use only visible map bounds for the grid
+          const bounds = map.getBounds();
+          const minLat = bounds.getSouth();
+          const maxLat = bounds.getNorth();
+          const minLon = bounds.getWest();
+          const maxLon = bounds.getEast();
+          const step = 0.01; // Higher resolution (smaller step = more detail, slower)
+
+          for (let lat = minLat; lat <= maxLat; lat += step) {
+            for (let lon = minLon; lon <= maxLon; lon += step) {
+              var district = getDistrict(lat, lon);
+              if (!district) continue; // Only draw inside districts
+              var dist = L.latLng(lat, lon).distanceTo(latlng) / 1000.0;
+              var amp = getDistrictAmp(district);
+              var raw = computeMMI(mag, dist);
+              var mmi = raw * amp;
+              mmi = Math.max(1, Math.min(9, Math.round(mmi)));
+              var color = colors[mmi] || '#ccc';
+              var rect = L.rectangle([
+                [lat, lon],
+                [lat + step, lon + step]
+              ], {
+                color: color,
+                weight: 0,
+                fillOpacity: 0.55
+              }).bindPopup(
+                `<div style="font-family:Montserrat,Arial,sans-serif;max-width:340px;">
+                  <div style="font-size:1.22em;font-weight:800;color:${color};margin-bottom:2px;display:flex;align-items:center;gap:7px;">
+                    <span style="font-size:1.3em;">${mmi >= 8 ? '⚠️' : mmi >= 6 ? '❗' : 'ℹ️'}</span> <span>MMI ${mmi}</span>
+                  </div>
+                  <div style="font-size:1.07em;margin-bottom:7px;font-weight:600;color:#b85c00;">${mmiInfo[mmi] ? mmiInfo[mmi].split(':')[0]+':' : ''}</div>
+                  <div style="font-size:1em;margin-bottom:7px;color:#444;">${mmiInfo[mmi] ? mmiInfo[mmi].split(':').slice(1).join(':') : ''}</div>
+                  <div style="font-size:0.99em;color:#555;display:flex;align-items:center;gap:6px;">🏙️ İlçe amplifikasyonu: <b>${amp.toFixed(2)}</b></div>
+                  <div style="font-size:0.99em;color:#555;display:flex;align-items:center;gap:6px;">📏 Uzaklık: <b>${dist.toFixed(1)} km</b></div>
+                  <div style="margin-top:12px;font-size:0.98em;color:#b85c00;font-weight:600;background:#fffbe6;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:7px;">
+                    <span style="font-size:1.2em;">⚠️</span> UYARI: Bu simülatör farkındalık amaçlıdır. Gerçek riskler için resmi kaynaklara başvurun.
+                  </div>
+                </div>`
+              ).addTo(gridLayer);
+            }
+          }
+          updateLegend(mag, amplDistrict);
+        }
+        // Attach event handler after drawGridMMI is defined
+        marker.on('dragend', drawGridMMI);
+        // Debounced slider for magnitude
+        const magRange = document.getElementById('magRange');
+        const magLabel = document.getElementById('magLabel');
+        let debounceTimer;
+        magRange.addEventListener('input', function() {
+          // Always update the label immediately
+          magLabel.textContent = parseFloat(this.value).toFixed(1);
+          // Debounce the heavy calculation
+          if (debounceTimer) clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            drawGridMMI();
+          }, 600);
+        });
+        drawGridMMI();
+      });
+    function updateLegend(mag, amplDistrict) {
+      if (!legendDiv) {
+        legendDiv = L.DomUtil.create('div','legend', map.getContainer());
+      }
+      legendDiv.innerHTML = '<strong>Deprem Büyüklüğü (Mw ' + mag.toFixed(1) + ')</strong><br>';
+      // Add black line for fault line
+      legendDiv.innerHTML += '<div class="item"><span class="color-box" style="background:#000;width:24px;height:4px;display:inline-block;margin-right:8px;border-radius:2px;"></span>Fay Hattı</div>';
+      mmiLevels.slice().reverse().forEach(function(mmi) {
+        var km = (baseRadii[mmi] * Math.pow(10, 0.5 * (mag - 7.4)) * (amplDistrict || 1.0)) / 1000;
+        var box = '<span class="color-box" style="background:' + colors[mmi] + ';"></span>';
+        var info = '<span class="info-icon" title="' + mmiInfo[mmi] + '">ℹ️</span>';
+        legendDiv.innerHTML += '<div class="item">' + box + 'MMI ' + mmi + ' (' + km.toFixed(1) + ' km)' + info + '</div>';
+      });
+    }
+    document.getElementById('helpBtn').onclick = function() {
+      document.getElementById('helpModal').style.display = 'flex';
+    };
+    document.getElementById('closeHelp').onclick = function() {
+      document.getElementById('helpModal').style.display = 'none';
+    };
+    document.getElementById('refBtn').onclick = function() {
+      document.getElementById('refModal').style.display = 'flex';
+    };
+    document.getElementById('closeRef').onclick = function() {
+      document.getElementById('refModal').style.display = 'none';
+    };
+    window.onclick = function(event) {
+      if (event.target === document.getElementById('helpModal')) {
+        document.getElementById('helpModal').style.display = 'none';
+      }
+      if (event.target === document.getElementById('refModal')) {
+        document.getElementById('refModal').style.display = 'none';
+      }
+    };
+    function setMapHeight() {
+      const hero = document.getElementById('hero');
+      const controls = document.getElementById('controls');
+      const mapDiv = document.getElementById('map');
+      let top = hero.offsetHeight + controls.offsetHeight + 24;
+      let height = window.innerHeight - top;
+      if (height < 120) height = 120;
+      mapDiv.style.height = height + 'px';
+    }
+    window.addEventListener('resize', setMapHeight);
+    setMapHeight();
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+// districtAmpl_data.js
+
+// Base soil amplification factors by İstanbul district
+// (from İBB Mikrobölgeleme 2007 & 2009 reports)
+export const districtAmpl = [
+    { district: "Adalar",       ampl: 1.5 },
+    { district: "Arnavutköy",   ampl: 1.0 },
+    { district: "Ataşehir",     ampl: 1.2 },
+    { district: "Avcılar",      ampl: 1.5 },
+    { district: "Bağcılar",     ampl: 1.3 },
+    { district: "Bahçelievler", ampl: 1.3 },
+    { district: "Bakırköy",     ampl: 1.5 },
+    { district: "Başakşehir",   ampl: 1.1 },
+    { district: "Bayrampaşa",   ampl: 1.2 },
+    { district: "Beşiktaş",     ampl: 1.0 },
+    { district: "Beykoz",       ampl: 1.0 },
+    { district: "Beylikdüzü",   ampl: 1.4 },
+    { district: "Beyoğlu",      ampl: 1.2 },
+    { district: "Büyükçekmece", ampl: 1.4 },
+    { district: "Çatalca",      ampl: 1.1 },
+    { district: "Çekmeköy",     ampl: 1.0 },
+    { district: "Esenler",      ampl: 1.3 },
+    { district: "Esenyurt",     ampl: 1.4 },
+    { district: "Eyüpsultan",   ampl: 1.1 },
+    { district: "Fatih",        ampl: 1.2 },
+    { district: "Gaziosmanpaşa",ampl: 1.2 },
+    { district: "Güngören",     ampl: 1.3 },
+    { district: "Kadıköy",      ampl: 1.2 },
+    { district: "Kağıthane",    ampl: 1.2 },
+    { district: "Kartal",       ampl: 1.3 },
+    { district: "Küçükçekmece", ampl: 1.4 },
+    { district: "Maltepe",      ampl: 1.3 },
+    { district: "Pendik",       ampl: 1.3 },
+    { district: "Sancaktepe",   ampl: 1.0 },
+    { district: "Sarıyer",      ampl: 1.0 },
+    { district: "Şile",         ampl: 1.0 },
+    { district: "Şişli",        ampl: 1.2 },
+    { district: "Sultanbeyli",  ampl: 1.1 },
+    { district: "Sultangazi",   ampl: 1.1 },
+    { district: "Tuzla",        ampl: 1.2 },
+    { district: "Ümraniye",     ampl: 1.0 },
+    { district: "Üsküdar",      ampl: 1.2 },
+    { district: "Zeytinburnu",  ampl: 1.5 }
+  ];
+  
