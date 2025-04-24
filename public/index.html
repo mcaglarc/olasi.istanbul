@@ -25,8 +25,17 @@
     #hero-content { flex: 1; text-align: left; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
     #hero h1 { font-size: 1.3em; margin: 0 0 4px 0; font-weight: 700; color: #1a237e; }
     #hero p { font-size: 1em; margin: 0 0 4px 0; opacity: 0.95; color: #1a237e; }
-    #helpBtn { position: absolute; top: 8px; right: 18px; background: #fff; color: #2980b9; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 1em; cursor: pointer; box-shadow: 0 2px 8px rgba(44,62,80,0.10); display: flex; align-items: center; justify-content: center; padding: 0; }
-    #refBtn { right: 54px; position: absolute; top: 8px; margin-left:4px;background:#fff;color:#2980b9;border:none;border-radius:16px;height:28px;font-size:1em;cursor:pointer;box-shadow:0 2px 8px rgba(44,62,80,0.10);display:flex;align-items:center;gap:6px;padding:0 12px 0 8px; }
+    #hero-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      position: absolute;
+      top: 8px;
+      right: 18px;
+    }
+    #helpBtn { background: #fff; color: #2980b9; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 1em; cursor: pointer; box-shadow: 0 2px 8px rgba(44,62,80,0.10); display: flex; align-items: center; justify-content: center; padding: 0; }
+    #refBtn { margin-left:4px;background:#fff;color:#2980b9;border:none;border-radius:16px;height:28px;font-size:1em;cursor:pointer;box-shadow:0 2px 8px rgba(44,62,80,0.10);display:flex;align-items:center;gap:6px;padding:0 12px 0 8px; }
     #controls { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 8px 0 0 0; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(44,62,80,0.10); padding: 8px 14px; width: fit-content; margin-left: auto; margin-right: auto; }
     #controls label { font-weight: bold; color: #2c3e50; font-size: 1em; margin-right: 8px; }
     #magRange { accent-color: #2980b9; width: 140px; height: 4px; border-radius: 4px; background: #e0eafc; }
@@ -59,9 +68,13 @@
         align-items: center;
         text-align: center;
       }
-      #helpBtn, #refBtn {
+      #hero-buttons {
         position: static;
-        margin: 2px 2px 0 2px;
+        margin-top: 4px;
+        justify-content: center;
+        width: 100%;
+      }
+      #helpBtn, #refBtn {
         min-width: 44px;
         min-height: 44px;
         font-size: 1.1em;
@@ -110,6 +123,7 @@
         box-shadow: 0 2px 8px rgba(44,62,80,0.13);
         cursor: pointer;
       }
+      #hero p { display: none; }
     }
     @media (max-width: 400px) {
       #map { height: calc(100vh - 60px); }
@@ -138,10 +152,12 @@
       <h1>Deprem Etki Simülatörü</h1>
       <p>Farklı büyüklük ve merkez üssü senaryolarında İstanbul genelinde şiddet değişimini görselleştirir</p>
     </div>
-    <button id="helpBtn" title="Yardım"><span aria-label="Yardım">❓</span></button>
-    <button id="refBtn" title="Referanslar">
-      <span style="font-size:1.1em;">🔗</span> Referanslar
-    </button>
+    <div id="hero-buttons">
+      <button id="helpBtn" title="Yardım"><span aria-label="Yardım">❓</span></button>
+      <button id="refBtn" title="Referanslar">
+        <span style="font-size:1.1em;">🔗</span> Referanslar
+      </button>
+    </div>
   </div>
   <div id="controls">
     <label for="magRange">Deprem Büyüklüğü (Mw):</label>
