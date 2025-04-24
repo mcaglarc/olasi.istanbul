@@ -62,22 +62,72 @@
       #helpBtn, #refBtn {
         position: static;
         margin: 2px 2px 0 2px;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1.1em;
       }
-      #hero h1 {
-        font-size: 1em;
-        margin-bottom: 2px;
+      #controls { 
+        font-size: 1em; 
+        flex-direction: column; 
+        gap: 8px; 
+        width: 98vw; 
+        box-sizing: border-box; 
+        padding: 8px 2vw; 
       }
-      #hero p {
-        font-size: 0.92em;
-        margin-bottom: 2px;
+      #controls label, #magLabel { font-size: 1.08em; }
+      #magRange { width: 90vw; max-width: 320px; }
+      #map { 
+        height: calc(100vh - 80px); 
+        min-height: 80px; 
+        border-radius: 8px; 
+        margin: 0 auto; 
+        width: 100vw;
       }
-      #controls { font-size: 0.98em; }
-      #map { height: calc(100vh - 80px); min-height: 80px; border-radius: 8px; }
-      .legend { font-size: 0.92em; padding: 7px 4px; border-radius: 7px; }
+      .legend { 
+        font-size: 0.92em; 
+        padding: 7px 4px; 
+        border-radius: 7px; 
+        min-width: 120px;
+        max-width: 90vw;
+        right: 4vw;
+        bottom: 4vw;
+        display: none; /* Hide legend by default on mobile */
+      }
+      .legend.show { display: block; }
+      #legendToggleBtn {
+        display: block;
+        position: fixed;
+        right: 4vw;
+        bottom: 4vw;
+        z-index: 1100;
+        background: #fff;
+        color: #2980b9;
+        border: none;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        font-size: 1.5em;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.13);
+        cursor: pointer;
+      }
     }
     @media (max-width: 400px) {
       #map { height: calc(100vh - 60px); }
       .legend { font-size: 0.85em; padding: 4px 2px; }
+    }
+    /* Make modals scrollable on mobile */
+    @media (max-width: 600px) {
+      .modal-content {
+        max-width: 96vw !important;
+        padding: 12px 6vw !important;
+        font-size: 1em;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      #helpModal, #refModal {
+        align-items: flex-start !important;
+        padding-top: 8vw;
+      }
     }
   </style>
 </head>
@@ -99,6 +149,7 @@
     <span id="magLabel">7.2</span>
   </div>
   <div id="map"></div>
+  <button id="legendToggleBtn" title="Etki Bölgeleri" style="display:none;">🗺️</button>
   <div id="helpModal" style="display:none;position:fixed;z-index:2000;left:0;top:0;width:100vw;height:100vh;background:rgba(44,62,80,0.25);align-items:center;justify-content:center;">
     <div class="modal-content" style="background:#fff;border-radius:14px;padding:24px 28px;max-width:400px;box-shadow:0 8px 32px rgba(44,62,80,0.18);text-align:left;position:relative;">
       <button id="closeHelp" title="Kapat" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.3em;color:#888;cursor:pointer;">&times;</button>
@@ -281,6 +332,11 @@
     function updateLegend(mag, amplDistrict) {
       if (!legendDiv) {
         legendDiv = L.DomUtil.create('div','legend', map.getContainer());
+        // Mobile legend toggle
+        if (window.innerWidth <= 600) {
+          document.getElementById('legendToggleBtn').style.display = 'block';
+          legendDiv.classList.remove('show');
+        }
       }
       legendDiv.innerHTML = '<strong>Deprem Büyüklüğü (Mw ' + mag.toFixed(1) + ')</strong><br>';
       // Add black line for fault line
@@ -291,6 +347,14 @@
         var info = '<span class="info-icon" title="' + mmiInfo[mmi] + '">ℹ️</span>';
         legendDiv.innerHTML += '<div class="item">' + box + 'MMI ' + mmi + ' (' + km.toFixed(1) + ' km)' + info + '</div>';
       });
+    }
+    // Legend toggle for mobile
+    const legendToggleBtn = document.getElementById('legendToggleBtn');
+    if (legendToggleBtn) {
+      legendToggleBtn.onclick = function() {
+        if (!legendDiv) return;
+        legendDiv.classList.toggle('show');
+      };
     }
     document.getElementById('helpBtn').onclick = function() {
       document.getElementById('helpModal').style.display = 'flex';
@@ -312,6 +376,17 @@
         document.getElementById('refModal').style.display = 'none';
       }
     };
+    window.addEventListener('resize', () => {
+      setMapHeight();
+      // Hide legend on mobile resize
+      if (window.innerWidth <= 600 && legendDiv) {
+        legendDiv.classList.remove('show');
+        legendToggleBtn.style.display = 'block';
+      } else if (legendDiv) {
+        legendDiv.classList.add('show');
+        legendToggleBtn.style.display = 'none';
+      }
+    });
     function setMapHeight() {
       const hero = document.getElementById('hero');
       const controls = document.getElementById('controls');
