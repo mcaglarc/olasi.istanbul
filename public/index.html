@@ -363,6 +363,8 @@
         }
       }
       legendDiv.innerHTML = '<strong>Deprem Büyüklüğü (Mw ' + mag.toFixed(1) + ')</strong><br>';
+      // Add blue pin for epicenter
+      legendDiv.innerHTML += '<div class="item"><span class="color-box" style="background:#2980b9;width:18px;height:18px;border-radius:50%;display:inline-block;margin-right:8px;position:relative;"><span style="position:absolute;left:2px;top:2px;font-size:1.1em;">🔵</span></span>Deprem Merkez Üssü</div>';
       // Add black line for fault line
       legendDiv.innerHTML += '<div class="item"><span class="color-box" style="background:#000;width:24px;height:4px;display:inline-block;margin-right:8px;border-radius:2px;"></span>Fay Hattı</div>';
       mmiLevels.slice().reverse().forEach(function(mmi) {
