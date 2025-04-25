@@ -19,7 +19,7 @@ Demo: https://olasi.istanbul
 
 1. Bu repoyu klonlayın:
    ```sh
-   git clone https://github.com/mcaglarc/deprem-simulator.git
+   git clone https://github.com/mcaglarc/olasi.istanbul.git
    ```
 2. Dosya yapısı:
    - `public/` — HTML dosyaları
