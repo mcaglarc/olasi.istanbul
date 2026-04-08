@@ -44,6 +44,13 @@ const REFERENCES = [
   ["Yenilenmiş Diri Fay Haritaları (MTA)", "https://www.mta.gov.tr/v3.0/hizmetler/yenilenmis-diri-fay-haritalari"],
   ["Kaynak kodu ve lisans bilgisi", "https://github.com/mcaglarc/olasi.istanbul"],
 ];
+const SITE_PAGES = [
+  ["/riskli-bina-belirtileri/", "Binanızın riskli olabileceğini nasıl anlarsınız?", "Kolon, kiriş, zemin ve kullanım geçmişi üzerinden erken uyarı işaretlerini özetler."],
+  ["/deprem-riskini-azaltma/", "Deprem riskini nasıl azaltabilirsiniz?", "Ev, apartman ve mahalle ölçeğinde uygulanabilir risk azaltma adımlarını toplar."],
+  ["/istanbul-deprem-bilgileri/", "İstanbul depremi hakkında temel bilgiler", "Fay hattı, zemin etkisi, senaryo okumaları ve şehir özelindeki önemli başlıkları açıklar."],
+  ["/acil-durum-iletisimleri/", "Acil durum bağlantıları", "112, AKOM, AFAD ve resmi bilgi kanallarını tek sayfada bir araya getirir."],
+  ["/deprem-hazirlik-kontrol-listesi/", "Deprem hazırlık kontrol listesi", "Aile planı, çanta, ev içi sabitleme ve toplantı noktaları için uygulanabilir yapılacaklar listesi sunar."],
+];
 
 function normalizeDistrictName(name) {
   if (!name) return "";
@@ -502,7 +509,11 @@ function App() {
             e("div", { key: "txt" }, [e("span", { className: "eyebrow", key: "ey" }, "İstanbul Senaryo"), e("h1", { className: "hero-title", key: "h1" }, "Fay üstü deprem haritası")]),
           ]),
           e("p", { className: "hero-copy", key: "copy" }, "Pin yalnızca fay çizgisine yerleşir."),
-          e("div", { className: "hero-actions", key: "act" }, [e("button", { className: "action-button", type: "button", onClick: () => setModalType("help"), key: "help" }, "Nasıl kullanılır"), e("button", { className: "ghost-button", type: "button", onClick: () => setModalType("references"), key: "refs" }, "Referanslar")]),
+          e("div", { className: "hero-actions", key: "act" }, [
+            e("button", { className: "action-button", type: "button", onClick: () => setModalType("help"), key: "help" }, "Nasıl kullanılır"),
+            e("button", { className: "ghost-button", type: "button", onClick: () => setModalType("references"), key: "refs" }, "Referanslar"),
+            e("button", { className: "ghost-button", type: "button", onClick: () => setModalType("menu"), key: "menu" }, "Bilgi menüsü"),
+          ]),
         ]),
         e("section", { className: "panel section-panel sidebar-controls", key: "scenario" }, [
           e("h2", { className: "section-title", key: "h" }, "Senaryo"),
@@ -536,6 +547,27 @@ function App() {
     ]),
     modalType === "help" ? e(Modal, { title: "Simülatör nasıl kullanılır?", copy: "Yeni arayüz, merkez üssünü yalnızca fay hattı üzerinde tutar.", onClose: () => setModalType(null), key: "help-modal" }, e("div", { className: "helper-list" }, HELP_STEPS.map((step, index) => e("div", { className: "helper-item", key: step }, [e("span", { className: "helper-index", key: "i" }, index + 1), e("p", { className: "helper-text", key: "t" }, step)])))) : null,
     modalType === "references" ? e(Modal, { title: "Veri kaynakları ve proje", copy: "Aşağıdaki bağlantılar uygulamada kullanılan temel referansları içerir.", onClose: () => setModalType(null), key: "refs-modal" }, e("ol", { className: "reference-list" }, REFERENCES.map(([label, href]) => e("li", { key: href }, e("a", { href, target: "_blank", rel: "noreferrer noopener" }, label))))) : null,
+    modalType === "menu"
+      ? e(
+          Modal,
+          {
+            title: "Deprem bilgi menüsü",
+            copy: "Haritanın yanına, İstanbul deprem hazırlığı ve risk farkındalığı için ek içerik sayfaları eklendi.",
+            onClose: () => setModalType(null),
+            key: "menu-modal",
+          },
+          e(
+            "div",
+            { className: "site-links-grid" },
+            SITE_PAGES.map(([href, title, copy]) =>
+              e("a", { className: "site-link-card", href, key: href }, [
+                e("strong", { key: "t" }, title),
+                e("span", { key: "c" }, copy),
+              ]),
+            ),
+          ),
+        )
+      : null,
   ]);
 }
 
