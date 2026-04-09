@@ -506,21 +506,19 @@ function App() {
         e("section", { className: "panel hero-panel sidebar-banner", key: "hero" }, [
           e("div", { className: "brand-row", key: "brand" }, [
             e("img", { className: "brand-logo", src: "./assets/logo.png", alt: "Deprem Etki Simülatörü logosu", key: "img" }),
-            e("div", { key: "txt" }, [e("span", { className: "eyebrow", key: "ey" }, "İstanbul Senaryo"), e("h1", { className: "hero-title", key: "h1" }, "Fay üstü deprem haritası")]),
+            e("div", { key: "txt" }, [
+              e("span", { className: "eyebrow", key: "ey" }, "Deprem senaryo aracı"),
+              e("h1", { className: "hero-title", key: "h1" }, "İstanbul deprem senaryo simülatörü"),
+            ]),
           ]),
-          e("p", { className: "hero-copy", key: "copy" }, "Pin yalnızca fay çizgisine yerleşir."),
-          e("div", { className: "hero-actions", key: "act" }, [
-            e("button", { className: "action-button", type: "button", onClick: () => setModalType("help"), key: "help" }, "Nasıl kullanılır"),
-            e("button", { className: "ghost-button", type: "button", onClick: () => setModalType("references"), key: "refs" }, "Referanslar"),
-            e("button", { className: "ghost-button", type: "button", onClick: () => setModalType("menu"), key: "menu" }, "Bilgi menüsü"),
-          ]),
+          e("p", { className: "hero-copy", key: "copy" }, "İstanbul ili için farklı deprem senaryolarında oluşabilecek etkileri ve olası sonuçları simüle eden analiz aracı."),
         ]),
         e("section", { className: "panel section-panel sidebar-controls", key: "scenario" }, [
           e("h2", { className: "section-title", key: "h" }, "Senaryo"),
           e("div", { className: "range-wrap", key: "w" }, [
             e("div", { className: "range-header", key: "head" }, [e("strong", { key: "s" }, "Mw büyüklüğü"), e("span", { className: "range-value", key: "v" }, magnitude.toFixed(1))]),
             e("input", { className: "range-input", type: "range", min: "6", max: "8.4", step: "0.1", value: magnitude, onInput: (event) => setMagnitude(Number(event.currentTarget.value)), key: "input" }),
-            e("div", { className: "pill-row", key: "pills" }, [e("span", { className: "pill", key: "p1" }, "Pin yalnızca fay hattına yerleşir"), e("span", { className: "pill", key: "p2" }, "Harita görünümü kaydırıldığında yeniden hesaplanır")]),
+            e("div", { className: "pill-row", key: "pills" }, [e("span", { className: "pill", key: "p1" }, "Merkez üssünü fay hattı üzerinden seçin"), e("span", { className: "pill", key: "p2" }, "Büyüklüğü değiştirerek sonuçları karşılaştırın")]),
           ]),
         ]),
         e("section", { className: "panel section-panel compact-panel sidebar-legend", key: "legend" }, [
@@ -528,8 +526,20 @@ function App() {
           e("div", { className: "legend-list compact-legend", key: "list" }, legendPreview),
         ]),
       ]),
-      e("main", { className: "panel map-panel", key: "main" }, [
-        e("div", { className: "map-toolbar", key: "toolbar" }, [e("div", { key: "txt" }, [e("h2", { className: "toolbar-title", key: "h" }, "İstanbul etki haritası"), e("p", { className: "toolbar-copy", key: "p" }, "Fay hattına tıklayarak ya da pini sürükleyerek merkez üssünü değiştirin.")]), e("div", { className: "map-actions", key: "a" }, [e("button", { className: "ghost-button", type: "button", onClick: () => actionsRef.current.focusIstanbul(), key: "focus" }, "İstanbul görünümüne dön"), e("button", { className: "primary-button", type: "button", onClick: () => actionsRef.current.resetEpicenter(), key: "reset" }, "Varsayılan üssü yükle")])]),
+      e("main", { className: "map-column", key: "maincol" }, [
+          e("section", { className: "panel map-panel", key: "main" }, [
+            e("div", { className: "map-toolbar", key: "toolbar" }, [
+              e("div", { className: "toolbar-meta", key: "txt" }, [
+                e("div", { className: "toolbar-actions", key: "a" }, [
+                  e("button", { className: "action-button toolbar-link-button", type: "button", onClick: () => setModalType("help"), key: "help" }, "Nasıl kullanılır"),
+                  e("button", { className: "ghost-button toolbar-link-button", type: "button", onClick: () => setModalType("references"), key: "refs" }, "Referanslar"),
+                  e("button", { className: "ghost-button toolbar-link-button", type: "button", onClick: () => setModalType("menu"), key: "menu" }, "Bilgi menüsü"),
+                  e("button", { className: "ghost-button", type: "button", onClick: () => actionsRef.current.focusIstanbul(), key: "focus" }, "İstanbul görünümüne dön"),
+                  e("button", { className: "primary-button", type: "button", onClick: () => actionsRef.current.resetEpicenter(), key: "reset" }, "Varsayılan üssü yükle"),
+                ]),
+                e("p", { className: "toolbar-copy", key: "p" }, "Fay hattına tıklayarak ya da pini sürükleyerek merkez üssünü değiştirin."),
+              ]),
+            ]),
         e("div", { className: "map-stage", key: "mapwrap" }, [
           e(MapView, { magnitude, onCellSelect: () => {}, onEpicenterChange: setEpicenter, onStatusChange: setStatusMessage, onBusyChange: setMapBusy, onReadyChange: setMapReady, onStatsChange: setMapStats, onActionsReady: (actions) => { actionsRef.current = actions; }, key: "map" }),
           e(MapAdDock, { collapsed: adCollapsed, onToggle: () => setAdCollapsed((value) => !value), key: "ad-dock" }),
@@ -543,6 +553,7 @@ function App() {
         e("div", { className: "map-bottom-bar", key: "bottom" }, [
           e("p", { className: "map-disclaimer", key: "warn" }, "Bu araç farkındalık içindir. Gerçek risk değerlendirmeleri için resmi veriler kullanılmalıdır."),
         ]),
+      ]),
       ]),
     ]),
     modalType === "help" ? e(Modal, { title: "Simülatör nasıl kullanılır?", copy: "Yeni arayüz, merkez üssünü yalnızca fay hattı üzerinde tutar.", onClose: () => setModalType(null), key: "help-modal" }, e("div", { className: "helper-list" }, HELP_STEPS.map((step, index) => e("div", { className: "helper-item", key: step }, [e("span", { className: "helper-index", key: "i" }, index + 1), e("p", { className: "helper-text", key: "t" }, step)])))) : null,

@@ -62,7 +62,15 @@ a {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 320px minmax(0, 1fr);
+  align-content: start;
   gap: 16px;
+  overflow: hidden;
+}
+
+.map-column {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
 }
 
@@ -113,7 +121,7 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .brand-logo {
@@ -139,24 +147,16 @@ a {
 .hero-title {
   margin: 4px 0 0;
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.1rem, 1.5vw, 1.45rem);
-  line-height: 1.02;
+  font-size: clamp(1.1rem, 1.45vw, 1.42rem);
+  line-height: 1.06;
 }
 
 .hero-copy {
-  margin: 0 0 4px;
+  margin: 0;
   color: var(--muted);
-  line-height: 1.35;
-  font-size: 0.82rem;
-}
-
-.hero-actions {
-  margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  position: relative;
-  z-index: 1;
+  line-height: 1.45;
+  font-size: 0.8rem;
+  max-width: 28ch;
 }
 
 .action-button,
@@ -419,10 +419,16 @@ a {
 
 .map-toolbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.toolbar-meta {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
 
 .toolbar-title {
@@ -437,10 +443,18 @@ a {
   font-size: 0.95rem;
 }
 
-.map-actions {
+.toolbar-link-button {
+  white-space: nowrap;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+}
+
+.toolbar-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .map-shell {
@@ -910,19 +924,20 @@ a {
   }
 
   .app-frame {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr) auto;
     height: calc(100vh - 24px);
     height: calc(100dvh - 24px);
   }
 
-  .map-panel {
-    order: -1;
+  .app-frame {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .map-column {
     min-height: 0;
   }
 
   .sidebar {
-    order: 2;
     position: static;
     overflow: hidden;
     height: auto;
@@ -981,10 +996,12 @@ a {
 
   .app-frame {
     gap: 6px;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(0, 1fr);
     height: calc(100vh - 12px);
     height: calc(100dvh - 12px);
+    min-height: 0;
+  }
+
+  .map-column {
     min-height: 0;
   }
 
@@ -1046,12 +1063,10 @@ a {
   }
 
   .hero-copy {
-    display: none;
-  }
-
-  .hero-actions {
-    margin-top: 4px;
-    gap: 6px;
+    display: block;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    max-width: none;
   }
 
   .map-overlay {
@@ -1060,20 +1075,24 @@ a {
     top: 8px;
   }
 
-  .hero-actions,
-  .map-actions {
-    width: 100%;
-  }
-
-  .hero-actions > button,
-  .map-actions > button {
-    flex: 1 1 0;
+  .toolbar-link-button,
+  .toolbar-actions > button {
     justify-content: center;
     min-height: 36px;
   }
 
   .map-toolbar {
     gap: 6px;
+  }
+
+  .toolbar-meta,
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .toolbar-link-button {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
   }
 
   .toolbar-title {
@@ -1087,8 +1106,14 @@ a {
   }
 
   .map-stage {
-    min-height: 0;
+    min-height: 320px;
     flex: 1;
+  }
+
+  .map-shell,
+  .map-canvas,
+  .leaflet-container {
+    min-height: 320px;
   }
 
   .map-ad-dock {
@@ -1150,11 +1175,6 @@ a {
   .pill {
     padding: 6px 8px;
     font-size: 0.74rem;
-  }
-
-  .hero-actions > button {
-    padding: 8px 8px;
-    font-size: 0.76rem;
   }
 
   .map-bottom-bar {

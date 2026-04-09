@@ -289,6 +289,64 @@ a {
   font-size: 0.88rem;
 }
 
+.content-ad-dock {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: min(320px, calc(100% - 32px));
+}
+
+.content-ad-toggle {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(18, 61, 74, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.94);
+  color: #17313a;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 18px rgba(20, 36, 42, 0.12);
+}
+
+.content-ad-shell {
+  width: min(100%, 320px);
+  padding: 10px 12px 12px;
+  border-radius: 20px;
+  background: rgba(255, 250, 241, 0.84);
+  border: 1px solid rgba(18, 61, 74, 0.08);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 28px rgba(20, 36, 42, 0.14);
+}
+
+.content-ad-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5a7077;
+  font-weight: 800;
+}
+
+.content-adsense-unit {
+  min-height: 50px;
+}
+
+.content-ad-note {
+  margin: 0;
+  color: #5a7077;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
 @media (max-width: 900px) {
   .content-grid {
     grid-template-columns: 1fr;
@@ -326,5 +384,23 @@ a {
 
   .gentle-menu summary {
     width: 100%;
+  }
+
+  .content-ad-dock {
+    right: 10px;
+    bottom: 10px;
+    max-width: min(280px, calc(100% - 20px));
+  }
+
+  .content-ad-toggle {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 0.74rem;
+  }
+
+  .content-ad-shell {
+    width: min(100%, 280px);
+    padding: 9px 10px 10px;
+    border-radius: 18px;
   }
 }
