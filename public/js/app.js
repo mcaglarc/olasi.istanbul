@@ -559,6 +559,7 @@ function App() {
                     e("strong", { key: "title" }, `Mw ${magnitude.toFixed(1)}`),
                   ]),
                 ]),
+                mobileMenuOpen ? e("div", { className: "mobile-menu-backdrop", onClick: () => setMobileMenuOpen(false), key: "mobile-menu-backdrop" }) : null,
                 e("div", { className: `mobile-menu-panel${mobileMenuOpen ? " is-open" : ""}`, id: "mobile-side-menu", key: "mobile-menu" }, [
                   renderHeroSection("mobile-hero"),
                   renderLegendSection("mobile-legend"),
