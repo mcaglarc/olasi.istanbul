@@ -457,6 +457,27 @@ a {
   align-items: center;
 }
 
+.mobile-toolbar,
+.mobile-menu-panel,
+.mobile-scenario-panel,
+.mobile-menu-actions {
+  display: none;
+}
+
+.mobile-menu-toggle {
+  white-space: nowrap;
+}
+
+.mobile-brand-summary {
+  display: grid;
+  gap: 2px;
+}
+
+.mobile-brand-summary strong {
+  font-size: 0.96rem;
+  font-family: "Space Grotesk", sans-serif;
+}
+
 .map-shell {
   position: relative;
   height: 100%;
@@ -957,18 +978,41 @@ a {
 }
 
 @media (max-width: 860px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .app-shell {
     padding: 8px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto;
+    overflow: visible;
   }
 
   .app-frame {
     gap: 8px;
+    height: auto;
+    min-height: calc(100vh - 16px);
+    min-height: calc(100dvh - 16px);
+    overflow: visible;
   }
 
   .sidebar {
     grid-template-columns: 1fr 1fr;
-    max-height: 24vh;
+    max-height: none;
     gap: 10px;
+    overflow: visible;
   }
 
   .sidebar > .hero-panel {
@@ -992,17 +1036,29 @@ a {
 @media (max-width: 640px) {
   .app-shell {
     padding: 6px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .app-frame {
     gap: 6px;
-    height: calc(100vh - 12px);
-    height: calc(100dvh - 12px);
-    min-height: 0;
+    height: auto;
+    min-height: calc(100vh - 12px);
+    min-height: calc(100dvh - 12px);
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr);
+    overflow: visible;
   }
 
   .map-column {
     min-height: 0;
+    overflow: visible;
+  }
+
+  .sidebar {
+    display: none;
   }
 
   .hero-panel,
@@ -1013,41 +1069,10 @@ a {
 
   .map-panel {
     order: 0;
-    min-height: 0;
-    height: 100%;
-    gap: 8px;
-  }
-
-  .sidebar {
-    order: 0;
-    max-height: none;
+    min-height: auto;
     height: auto;
-    overflow: hidden;
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    gap: 6px;
-    padding-right: 0;
-    align-items: stretch;
-  }
-
-  .sidebar-banner,
-  .sidebar-controls {
-    display: block;
-    width: 100%;
-  }
-
-  .sidebar-legend {
-    display: none;
-  }
-
-  .sidebar-banner {
-    min-height: 0;
-    padding: 10px 12px;
-  }
-
-  .sidebar-controls {
-    min-height: 0;
-    padding: 10px 12px;
+    gap: 8px;
+    overflow: visible;
   }
 
   .brand-logo {
@@ -1078,20 +1103,89 @@ a {
   .toolbar-link-button,
   .toolbar-actions > button {
     justify-content: center;
-    min-height: 36px;
+    min-height: 40px;
   }
 
   .map-toolbar {
     gap: 6px;
+    align-items: stretch;
   }
 
   .toolbar-meta,
-  .toolbar-actions {
+  .toolbar-actions,
+  .mobile-toolbar,
+  .mobile-scenario-panel,
+  .mobile-menu-panel {
     width: 100%;
   }
 
+  .mobile-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .mobile-menu-panel {
+    display: grid;
+    gap: 8px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: max-height 0.28s ease, opacity 0.22s ease, transform 0.22s ease, margin 0.22s ease;
+    margin: 0;
+  }
+
+  .mobile-menu-panel.is-open {
+    max-height: 960px;
+    opacity: 1;
+    transform: translateY(0);
+    margin: 2px 0 4px;
+  }
+
+  .mobile-menu-panel .sidebar-legend {
+    display: flex;
+  }
+
+  .mobile-menu-panel .sidebar-legend .legend-list {
+    overflow: visible;
+    max-height: none;
+    padding-right: 0;
+  }
+
+  .mobile-menu-panel .hero-panel,
+  .mobile-menu-panel .section-panel {
+    padding: 10px 12px;
+  }
+
+  .mobile-menu-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mobile-scenario-panel {
+    display: block;
+  }
+
+  .mobile-scenario-panel .sidebar-controls {
+    margin: 0;
+    padding: 10px 12px;
+  }
+
+  .toolbar-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    justify-content: stretch;
+  }
+
+  .desktop-toolbar-action {
+    display: none;
+  }
+
   .toolbar-link-button {
-    flex: 1 1 calc(50% - 6px);
     min-width: 0;
   }
 
@@ -1106,14 +1200,17 @@ a {
   }
 
   .map-stage {
-    min-height: 320px;
-    flex: 1;
+    height: clamp(360px, 62vh, 560px);
+    min-height: 360px;
+    flex: 0 0 auto;
+    overflow: hidden;
   }
 
   .map-shell,
   .map-canvas,
   .leaflet-container {
-    min-height: 320px;
+    height: 100%;
+    min-height: 360px;
   }
 
   .map-ad-dock {
@@ -1144,6 +1241,7 @@ a {
   .modal-card {
     padding: 16px;
     max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
   }
 
   .section-panel {
@@ -1179,5 +1277,47 @@ a {
 
   .map-bottom-bar {
     display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-row {
+    align-items: flex-start;
+  }
+
+  .mobile-menu-actions,
+  .toolbar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .map-stage {
+    height: clamp(340px, 58vh, 500px);
+    min-height: 340px;
+  }
+
+  .map-shell,
+  .map-canvas,
+  .leaflet-container {
+    min-height: 340px;
+  }
+
+  .map-ad-dock {
+    left: 8px;
+    right: 8px;
+    align-items: stretch;
+    max-width: none;
+  }
+
+  .map-ad-toggle,
+  .map-ad-shell {
+    width: 100%;
+  }
+
+  .modal-header {
+    gap: 12px;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
   }
 }

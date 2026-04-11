@@ -478,6 +478,7 @@ function App() {
   const [magnitude, setMagnitude] = useState(DEFAULT_MAGNITUDE);
   const [modalType, setModalType] = useState(null);
   const [adCollapsed, setAdCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [epicenter, setEpicenter] = useState({ latitude: DEFAULT_EPICENTER[0], longitude: DEFAULT_EPICENTER[1], district: null, snapped: true, source: "Başlangıç" });
   const [mapBusy, setMapBusy] = useState(true);
   const [mapReady, setMapReady] = useState(false);
@@ -500,42 +501,76 @@ function App() {
     ]),
   );
 
-  return e("div", { className: "app-shell" }, [
-    e("div", { className: "app-frame", key: "frame" }, [
-      e("aside", { className: "sidebar", key: "sidebar" }, [
-        e("section", { className: "panel hero-panel sidebar-banner", key: "hero" }, [
-          e("div", { className: "brand-row", key: "brand" }, [
-            e("img", { className: "brand-logo", src: "./assets/logo.png", alt: "Deprem Etki Simülatörü logosu", key: "img" }),
-            e("div", { key: "txt" }, [
-              e("span", { className: "eyebrow", key: "ey" }, "Deprem senaryo aracı"),
-              e("h1", { className: "hero-title", key: "h1" }, "İstanbul deprem senaryo simülatörü"),
-            ]),
-          ]),
-          e("p", { className: "hero-copy", key: "copy" }, "İstanbul ili için farklı deprem senaryolarında oluşabilecek etkileri ve olası sonuçları simüle eden analiz aracı."),
-        ]),
-        e("section", { className: "panel section-panel sidebar-controls", key: "scenario" }, [
-          e("h2", { className: "section-title", key: "h" }, "Senaryo"),
-          e("div", { className: "range-wrap", key: "w" }, [
-            e("div", { className: "range-header", key: "head" }, [e("strong", { key: "s" }, "Mw büyüklüğü"), e("span", { className: "range-value", key: "v" }, magnitude.toFixed(1))]),
-            e("input", { className: "range-input", type: "range", min: "6", max: "8.4", step: "0.1", value: magnitude, onInput: (event) => setMagnitude(Number(event.currentTarget.value)), key: "input" }),
-            e("div", { className: "pill-row", key: "pills" }, [e("span", { className: "pill", key: "p1" }, "Merkez üssünü fay hattı üzerinden seçin"), e("span", { className: "pill", key: "p2" }, "Büyüklüğü değiştirerek sonuçları karşılaştırın")]),
-          ]),
-        ]),
-        e("section", { className: "panel section-panel compact-panel sidebar-legend", key: "legend" }, [
-          e("h2", { className: "section-title", key: "h" }, "Etki seviyeleri"),
-          e("div", { className: "legend-list compact-legend", key: "list" }, legendPreview),
+  function renderHeroSection(key) {
+    return e("section", { className: "panel hero-panel sidebar-banner", key }, [
+      e("div", { className: "brand-row", key: "brand" }, [
+        e("img", { className: "brand-logo", src: "./assets/logo.png", alt: "Deprem Etki Simülatörü logosu", key: "img" }),
+        e("div", { key: "txt" }, [
+          e("span", { className: "eyebrow", key: "ey" }, "Deprem senaryo aracı"),
+          e("h1", { className: "hero-title", key: "h1" }, "İstanbul deprem senaryo simülatörü"),
         ]),
       ]),
+      e("p", { className: "hero-copy", key: "copy" }, "İstanbul ili için farklı deprem senaryolarında oluşabilecek etkileri ve olası sonuçları simüle eden analiz aracı."),
+    ]);
+  }
+
+  function renderScenarioSection(key) {
+    return e("section", { className: "panel section-panel sidebar-controls", key }, [
+      e("h2", { className: "section-title", key: "h" }, "Senaryo"),
+      e("div", { className: "range-wrap", key: "w" }, [
+        e("div", { className: "range-header", key: "head" }, [e("strong", { key: "s" }, "Mw büyüklüğü"), e("span", { className: "range-value", key: "v" }, magnitude.toFixed(1))]),
+        e("input", { className: "range-input", type: "range", min: "6", max: "8.4", step: "0.1", value: magnitude, onInput: (event) => setMagnitude(Number(event.currentTarget.value)), key: "input" }),
+        e("div", { className: "pill-row", key: "pills" }, [e("span", { className: "pill", key: "p1" }, "Merkez üssünü fay hattı üzerinden seçin"), e("span", { className: "pill", key: "p2" }, "Büyüklüğü değiştirerek sonuçları karşılaştırın")]),
+      ]),
+    ]);
+  }
+
+  function renderLegendSection(key) {
+    return e("section", { className: "panel section-panel compact-panel sidebar-legend", key }, [
+      e("h2", { className: "section-title", key: "h" }, "Etki seviyeleri"),
+      e("div", { className: "legend-list compact-legend", key: "list" }, legendPreview),
+    ]);
+  }
+
+  const mobileQuickActions = e("div", { className: "mobile-menu-actions" }, [
+    e("button", { className: "action-button toolbar-link-button", type: "button", onClick: () => { setMobileMenuOpen(false); setModalType("help"); }, key: "help" }, "Nasıl kullanılır"),
+    e("button", { className: "ghost-button toolbar-link-button", type: "button", onClick: () => { setMobileMenuOpen(false); setModalType("references"); }, key: "refs" }, "Referanslar"),
+    e("button", { className: "ghost-button toolbar-link-button", type: "button", onClick: () => { setMobileMenuOpen(false); setModalType("menu"); }, key: "menu" }, "Bilgi menüsü"),
+  ]);
+
+  return e("div", { className: "app-shell" }, [
+    e("div", { className: "app-frame", key: "frame" }, [
+      e("aside", { className: "sidebar", key: "sidebar" }, [renderHeroSection("hero"), renderScenarioSection("scenario"), renderLegendSection("legend")]),
       e("main", { className: "map-column", key: "maincol" }, [
           e("section", { className: "panel map-panel", key: "main" }, [
             e("div", { className: "map-toolbar", key: "toolbar" }, [
               e("div", { className: "toolbar-meta", key: "txt" }, [
+                e("div", { className: "mobile-toolbar", key: "mobile-toolbar" }, [
+                  e("button", {
+                    className: `ghost-button mobile-menu-toggle${mobileMenuOpen ? " is-open" : ""}`,
+                    type: "button",
+                    "aria-expanded": String(mobileMenuOpen),
+                    "aria-controls": "mobile-side-menu",
+                    onClick: () => setMobileMenuOpen((value) => !value),
+                    key: "mobile-menu-toggle",
+                  }, mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"),
+                  e("div", { className: "mobile-brand-summary", key: "mobile-brand" }, [
+                    e("span", { className: "eyebrow", key: "ey" }, "İstanbul senaryosu"),
+                    e("strong", { key: "title" }, `Mw ${magnitude.toFixed(1)}`),
+                  ]),
+                ]),
+                e("div", { className: `mobile-menu-panel${mobileMenuOpen ? " is-open" : ""}`, id: "mobile-side-menu", key: "mobile-menu" }, [
+                  renderHeroSection("mobile-hero"),
+                  renderLegendSection("mobile-legend"),
+                  mobileQuickActions,
+                ]),
+                e("div", { className: "mobile-scenario-panel", key: "mobile-scenario" }, [renderScenarioSection("mobile-scenario-section")]),
                 e("div", { className: "toolbar-actions", key: "a" }, [
-                  e("button", { className: "action-button toolbar-link-button", type: "button", onClick: () => setModalType("help"), key: "help" }, "Nasıl kullanılır"),
-                  e("button", { className: "ghost-button toolbar-link-button", type: "button", onClick: () => setModalType("references"), key: "refs" }, "Referanslar"),
-                  e("button", { className: "ghost-button toolbar-link-button", type: "button", onClick: () => setModalType("menu"), key: "menu" }, "Bilgi menüsü"),
-                  e("button", { className: "ghost-button", type: "button", onClick: () => actionsRef.current.focusIstanbul(), key: "focus" }, "İstanbul görünümüne dön"),
-                  e("button", { className: "primary-button", type: "button", onClick: () => actionsRef.current.resetEpicenter(), key: "reset" }, "Varsayılan üssü yükle"),
+                  e("button", { className: "action-button toolbar-link-button desktop-toolbar-action", type: "button", onClick: () => setModalType("help"), key: "help" }, "Nasıl kullanılır"),
+                  e("button", { className: "ghost-button toolbar-link-button desktop-toolbar-action", type: "button", onClick: () => setModalType("references"), key: "refs" }, "Referanslar"),
+                  e("button", { className: "ghost-button toolbar-link-button desktop-toolbar-action", type: "button", onClick: () => setModalType("menu"), key: "menu" }, "Bilgi menüsü"),
+                  e("button", { className: "ghost-button mobile-map-action", type: "button", onClick: () => actionsRef.current.focusIstanbul(), key: "focus" }, "İstanbul görünümüne dön"),
+                  e("button", { className: "primary-button mobile-map-action", type: "button", onClick: () => actionsRef.current.resetEpicenter(), key: "reset" }, "Varsayılan üssü yükle"),
                 ]),
                 e("p", { className: "toolbar-copy", key: "p" }, "Fay hattına tıklayarak ya da pini sürükleyerek merkez üssünü değiştirin."),
               ]),
